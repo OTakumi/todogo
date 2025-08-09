@@ -7,9 +7,10 @@ import (
 )
 
 type Task struct {
-	ID        uuid.UUID
-	Title     string
-	Deadline  time.Time
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID         uuid.UUID
+	Title      string
+	Deadline   time.Time
+	IsComplete bool
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 }
