@@ -9,10 +9,11 @@ import (
 func TestNewTask(t *testing.T) {
 	t.Run("NewTask関数がTaskを問題なく生成すること", func(t *testing.T) {
 		// Arrange
+		id := "a95fbaab-5356-94e9-011c-97b0e37af5aa"
 		title := "Testing Go"
 
 		// Act
-		task := model.NewTask(title)
+		task := model.NewTask(id, title)
 
 		// Assert
 		// オブジェクトがnilでないこと
