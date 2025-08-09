@@ -15,8 +15,11 @@ type taskUsecase struct {
 	idGenerator service.IDGenerator
 }
 
-func NewTaskUsecase(tr repository.TaskRepository) TaskUsecase {
-	return &taskUsecase{taskRepo: tr}
+func NewTaskUsecase(tr repository.TaskRepository, ig service.IDGenerator) TaskUsecase {
+	return &taskUsecase{
+		taskRepo:    tr,
+		idGenerator: ig,
+	}
 }
 
 func (tu *taskUsecase) CreateTask(title string) (*model.Task, error) {
