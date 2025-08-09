@@ -3,12 +3,10 @@ package model
 import (
 	"errors"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Task struct {
-	ID         uuid.UUID
+	ID         string
 	Title      string
 	Deadline   time.Time
 	IsComplete bool
@@ -16,15 +14,9 @@ type Task struct {
 	UpdatedAt  time.Time
 }
 
-func NewTask(title string) *Task {
-	// UUIDを生成する
-	uuid, err := uuid.NewUUID()
-	if err != nil {
-		panic(err)
-	}
-
+func NewTask(id string, title string) *Task {
 	return &Task{
-		ID:         uuid,
+		ID:         id,
 		Title:      title,
 		IsComplete: false,
 		CreatedAt:  time.Now(),
