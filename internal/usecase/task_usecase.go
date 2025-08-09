@@ -3,6 +3,7 @@ package usecase
 import (
 	"OTakumi/todogo/internal/domain/model"
 	"OTakumi/todogo/internal/domain/repository"
+	"OTakumi/todogo/internal/domain/service"
 )
 
 type TaskUsecase interface {
@@ -10,7 +11,8 @@ type TaskUsecase interface {
 }
 
 type taskUsecase struct {
-	taskRepo repository.TaskRepository
+	taskRepo    repository.TaskRepository
+	idGenerator service.IDGenerator
 }
 
 func NewTaskUsecase(tr repository.TaskRepository) TaskUsecase {
@@ -18,9 +20,14 @@ func NewTaskUsecase(tr repository.TaskRepository) TaskUsecase {
 }
 
 func (tu *taskUsecase) CreateTask(title string) (*model.Task, error) {
-	task := &model.Task{
-		Title:      title,
-		IsComplete: false,
+	// idを取得する
+	id := tu.idGenerator.NewID()
+
+	// タスクを生成
+	task := model.NewTask(id, title)
+
+	if err := task.Validate(); err != nil {
+		return nil, err
 	}
 
 	return tu.taskRepo.Create(task)
