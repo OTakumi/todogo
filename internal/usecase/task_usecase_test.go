@@ -37,7 +37,7 @@ func TestTaskUsecase_CreateTask_Failure(t *testing.T) {
 	_, err := taskUsecase.CreateTask(expectedTitle)
 
 	// Assert
-	// エラーがないことを確認
+	// エラーがあることを確認
 	assert.Error(t, err)
 
 	mockRepo.AssertExpectations(t)
