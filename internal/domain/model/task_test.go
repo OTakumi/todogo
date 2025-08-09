@@ -57,7 +57,7 @@ func TestTask_Validate(t *testing.T) {
 		// Validateがエラーを返す
 		// nilの場合、テストが失敗する
 		if err == nil {
-			t.Error("Expected an error, but go nil")
+			t.Error("Expected an error, but got nil")
 		}
 	})
 
