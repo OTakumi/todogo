@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"OTakumi/todogo/internal/domain/model"
-	"OTakumi/todogo/internal/domain/repository"
 	"OTakumi/todogo/internal/domain/service"
+	"OTakumi/todogo/internal/repository"
 )
 
 type TaskUsecase interface {
