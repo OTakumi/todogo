@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    container_name: postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: p@ssw0rd
+      POSTGRES_DB: todogo
+    volumes:
+      - postgres_data:/var/lib/postgres/data
+volumes:
+  postgres_data:
