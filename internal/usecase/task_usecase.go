@@ -9,6 +9,7 @@ import (
 
 type TaskUsecase interface {
 	CreateTask(ctx context.Context, title string) (*model.Task, error)
+	FindAll(ctx context.Context) ([]*model.Task, error)
 }
 
 type taskUsecase struct {
@@ -35,4 +36,12 @@ func (tu *taskUsecase) CreateTask(ctx context.Context, title string) (*model.Tas
 	}
 
 	return tu.taskRepo.Create(ctx, task)
+}
+
+// FindAll は登録されているすべてのタスクを取得する
+// リポジトリ層に処理を委譲し、取得したタスクをそのまま返す
+func (tu *taskUsecase) FindAll(ctx context.Context) ([]*model.Task, error) {
+	// リポジトリ層のFindAllメソッドを呼び出し
+	// データベースからすべてのタスクを取得する
+	return tu.taskRepo.FindAll(ctx)
 }
