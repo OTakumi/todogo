@@ -1,0 +1,45 @@
+package usecase_test
+
+import (
+	"OTakumi/todogo/internal/domain/model"
+	"OTakumi/todogo/internal/usecase"
+	"context"
+	"errors"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
+
+// タスク作成が成功する場合
+func TestTaskUsecase_CreateTask_Failure(t *testing.T) {
+	// Arrange
+	mockRepo := new(MockTaskRepository)
+
+	// 固定のIDを返すモックIDジェネレータ
+	expectedUUID := "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+	expectedTitle := "usecaseのテストを書く"
+
+	mockIDGenerator := &MockIDGenerator{ID: expectedUUID}
+
+	mockRepo.On(
+		"Create",
+		mock.Anything, // context
+		mock.MatchedBy(func(task *model.Task) bool {
+			return task.ID == expectedUUID && task.Title == expectedTitle
+		}),
+	).Return(nil, errors.New("error"))
+
+	// UsecaseにRepositoryとIDGeneratorのモックを注入
+	taskUsecase := usecase.NewTaskUsecase(mockRepo, mockIDGenerator)
+
+	// Act
+	_, err := taskUsecase.CreateTask(context.Background(), expectedTitle)
+
+	// Assert
+	// エラーがあることを確認
+	assert.Error(t, err)
+
+	mockRepo.AssertExpectations(t)
+}
+

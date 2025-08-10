@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"OTakumi/todogo/internal/usecase"
+	"database/sql"
 	"fmt"
 	"os"
 
@@ -16,7 +18,19 @@ var (
 		Use:   "todo_cli",
 		Short: "A Simple CLI todo application",
 	}
+
+	// アプリケーション全体で共有する依存関係
+	// これらはmain関数で初期化され、各コマンドから利用される
+	db          *sql.DB
+	taskUsecase usecase.TaskUsecase
 )
+
+// SetupDependencies は外部から依存関係を注入するための関数
+// main関数で初期化されたDB接続とユースケースを受け取る
+func SetupDependencies(database *sql.DB, tu usecase.TaskUsecase) {
+	db = database
+	taskUsecase = tu
+}
 
 // Execute executes the root command.
 func Execute() error {
