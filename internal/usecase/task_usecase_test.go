@@ -3,6 +3,7 @@ package usecase_test
 import (
 	"OTakumi/todogo/internal/domain/model"
 	"OTakumi/todogo/internal/usecase"
+	"context"
 	"errors"
 	"testing"
 
@@ -23,10 +24,9 @@ func TestTaskUsecase_CreateTask_Failure(t *testing.T) {
 
 	mockRepo.On(
 		"Create",
+		mock.Anything, // context
 		mock.MatchedBy(func(task *model.Task) bool {
-			idMatch := task.ID == expectedUUID
-			titleMatch := task.Title == expectedTitle
-			return idMatch && titleMatch
+			return task.ID == expectedUUID && task.Title == expectedTitle
 		}),
 	).Return(nil, errors.New("error"))
 
@@ -34,7 +34,7 @@ func TestTaskUsecase_CreateTask_Failure(t *testing.T) {
 	taskUsecase := usecase.NewTaskUsecase(mockRepo, mockIDGenerator)
 
 	// Act
-	_, err := taskUsecase.CreateTask(expectedTitle)
+	_, err := taskUsecase.CreateTask(context.Background(), expectedTitle)
 
 	// Assert
 	// エラーがあることを確認

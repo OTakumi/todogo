@@ -4,10 +4,11 @@ import (
 	"OTakumi/todogo/internal/domain/model"
 	"OTakumi/todogo/internal/domain/service"
 	"OTakumi/todogo/internal/repository"
+	"context"
 )
 
 type TaskUsecase interface {
-	CreateTask(title string) (*model.Task, error)
+	CreateTask(ctx context.Context, title string) (*model.Task, error)
 }
 
 type taskUsecase struct {
@@ -22,7 +23,7 @@ func NewTaskUsecase(tr repository.TaskRepository, ig service.IDGenerator) TaskUs
 	}
 }
 
-func (tu *taskUsecase) CreateTask(title string) (*model.Task, error) {
+func (tu *taskUsecase) CreateTask(ctx context.Context, title string) (*model.Task, error) {
 	// idを取得する
 	id := tu.idGenerator.NewID()
 
@@ -33,5 +34,5 @@ func (tu *taskUsecase) CreateTask(title string) (*model.Task, error) {
 		return nil, err
 	}
 
-	return tu.taskRepo.Create(task)
+	return tu.taskRepo.Create(ctx, task)
 }
