@@ -3,6 +3,8 @@ package main
 import (
 	"OTakumi/todogo/cmd"
 	"OTakumi/todogo/internal/infrastructure"
+	"OTakumi/todogo/internal/infrastructure/generator"
+	"OTakumi/todogo/internal/usecase"
 	"fmt"
 	"log"
 	"os"
@@ -40,5 +42,18 @@ func main() {
 	}
 	defer dbHandler.DB.Close()
 
-	cmd.Execute()
+	// アプリケーションの依存関係を構築
+	// リポジトリ、IDジェネレータ、ユースケースを初期化
+	taskRepo := infrastructure.NewTaskRepository(dbHandler.DB)
+	idGen := generator.NewUUIDGenerator()
+	taskUsecase := usecase.NewTaskUsecase(taskRepo, idGen)
+
+	// cmdパッケージに依存関係を注入
+	// これにより、各コマンドは共通の依存関係を利用できる
+	cmd.SetupDependencies(dbHandler.DB, taskUsecase)
+
+	// コマンドを実行
+	if err := cmd.Execute(); err != nil {
+		log.Fatal(err)
+	}
 }
