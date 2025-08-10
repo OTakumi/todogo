@@ -16,7 +16,7 @@ type PostgreSQLHandler struct {
 func NewPostgreSQLHandler(dsn string) (*PostgreSQLHandler, error) {
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open posgresql: %w", err)
+		return nil, fmt.Errorf("failed to open postgresql: %w", err)
 	}
 
 	// 接続が実際に確立されるまで待機
