@@ -65,11 +65,13 @@ func TestTaskUsecase_FindAll(t *testing.T) {
 
 		// リポジトリが返すべき複数のタスクを定義
 		// 異なる状態のタスクを用意することで、様々なケースをカバー
+		deadline1 := now
+		deadline2 := now.Add(24 * time.Hour)
 		expectedTasks := []*model.Task{
 			{
 				ID:         "1",
 				Title:      "Task 1",
-				Deadline:   now,
+				Deadline:   &deadline1,
 				IsComplete: false, // 未完了のタスク
 				CreatedAt:  now,
 				UpdatedAt:  now,
@@ -77,8 +79,8 @@ func TestTaskUsecase_FindAll(t *testing.T) {
 			{
 				ID:         "2",
 				Title:      "Task 2",
-				Deadline:   now.Add(24 * time.Hour), // 1日後の締切
-				IsComplete: true,                    // 完了済みのタスク
+				Deadline:   &deadline2,
+				IsComplete: true, // 完了済みのタスク
 				CreatedAt:  now,
 				UpdatedAt:  now,
 			},
@@ -142,4 +144,3 @@ func TestTaskUsecase_FindAll(t *testing.T) {
 		mockRepo.AssertExpectations(t)
 	})
 }
-

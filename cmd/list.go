@@ -63,7 +63,7 @@ This command retrieves and displays all tasks with their details including:
 
 			// 締切日をフォーマット（未設定の場合は"-"を表示）
 			deadlineStr := "-"
-			if !task.Deadline.IsZero() {
+			if task.Deadline != nil {
 				deadlineStr = task.Deadline.Format("2006-01-02")
 			}
 

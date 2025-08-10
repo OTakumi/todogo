@@ -8,7 +8,7 @@ import (
 type Task struct {
 	ID         string
 	Title      string
-	Deadline   time.Time
+	Deadline   *time.Time // NULLを許可するためポインタ型
 	IsComplete bool
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
