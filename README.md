@@ -10,8 +10,9 @@ A command-line todo management application built with Go, following clean archit
 
 ## Prerequisites
 
-- Go 1.22.2 or higher
+- Go 1.23.0 or higher
 - PostgreSQL (or Docker for containerized PostgreSQL)
+- golang-migrate CLI tool (for database migrations)
 - Make (optional, for using Makefile commands)
 
 ## Installation
@@ -23,13 +24,27 @@ git clone https://github.com/yourusername/todogo.git
 cd todogo
 ```
 
-2. Install dependencies:
+2. Install golang-migrate CLI tool:
+
+```bash
+# For macOS using Homebrew
+brew install golang-migrate
+
+# For Ubuntu/Debian
+curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-amd64.tar.gz | tar xvz
+sudo mv migrate /usr/local/bin/
+
+# For Go users (any platform)
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+```
+
+3. Install dependencies:
 
 ```bash
 go mod download
 ```
 
-3. Set up environment variables:
+4. Set up environment variables:
 
 ```bash
 cp .env.template .env
@@ -45,24 +60,43 @@ DB_PORT=5433
 DB_HOST=localhost
 ```
 
-4. Set up the database:
+5. Set up the database:
 
-Using Docker Compose (recommended):
+Using Docker Compose and Make (recommended):
 
 ```bash
-docker-compose up -d
+# Start database and run migrations in one command
+make setup
 ```
 
-Or use your existing PostgreSQL installation and create a database:
+Or manually:
+
+```bash
+# Start database container
+docker-compose up -d
+
+# Wait for database to be ready, then run migrations
+make migrate-up
+```
+
+Or use your existing PostgreSQL installation:
 
 ```sql
 CREATE DATABASE todogo_db;
 ```
 
-5. Build the application:
+Then run migrations:
+
+```bash
+make migrate-up
+```
+
+6. Build the application:
 
 ```bash
 go build -o todogo .
+# or
+make build
 ```
 
 ## Usage
@@ -110,12 +144,41 @@ todogo version
 - `--help` - Show help for any command
 - `--config` - Specify custom config file location
 
+## Database Management
+
+### Migration Commands
+
+```bash
+# Run all pending migrations
+make migrate-up
+
+# Rollback the last migration
+make migrate-down
+
+# Reset database (rollback all then reapply)
+make migrate-reset
+
+# Check migration status
+make migrate-status
+
+# Create a new migration
+make migrate-create NAME=add_new_feature
+
+# Start database container
+make db-up
+
+# Stop database container
+make db-down
+```
+
 ## Development
 
 ### Running Tests
 
 ```bash
 go test ./...
+# or
+make test
 ```
 
 ### Running with Hot Reload
@@ -128,4 +191,16 @@ go run main.go [command]
 
 ```bash
 go build -ldflags="-s -w" -o todogo .
+# or
+make build
+```
+
+### Development Environment Setup
+
+```bash
+# Complete setup (database + migrations)
+make setup
+
+# Clean up everything
+make clean
 ```
