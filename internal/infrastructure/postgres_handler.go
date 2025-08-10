@@ -28,7 +28,7 @@ func NewPostgreSQLHandler(dsn string) (*PostgreSQLHandler, error) {
 	if err := db.Ping(); err != nil {
 		db.Close()
 
-		return nil, fmt.Errorf("Failed to ping postgres: %w", err)
+		return nil, fmt.Errorf("failed to ping postgres: %w", err)
 	}
 
 	log.Println("Successfully connected to the database.")
