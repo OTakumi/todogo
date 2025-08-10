@@ -2,37 +2,13 @@ package main
 
 import (
 	"OTakumi/todogo/cmd"
-	"database/sql"
+	"OTakumi/todogo/internal/infrastructure"
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/joho/godotenv"
-
-	_ "github.com/lib/pq"
 )
-
-func setupDB(dbDriver string, dsn string) (*sql.DB, error) {
-	db, err := sql.Open(dbDriver, dsn)
-	if err != nil {
-		return nil, err
-	}
-
-	// 接続が実際に確立されるまで待機
-	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
-
-	// 接続確認
-	if err := db.Ping(); err != nil {
-		db.Close()
-
-		return nil, fmt.Errorf("Failed to ping postgres: %w", err)
-	}
-
-	return db, err
-}
 
 func main() {
 	// dotenvファイルから環境変数を読み込む
@@ -49,7 +25,6 @@ func main() {
 	dbName := os.Getenv("POSTGRES_DB")
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
-	dbDriver := "postgres"
 
 	// 必須の環境変数が設定されているか確認
 	if dbUser == "" || dbPassword == "" || dbHost == "" || dbPort == "" || dbName == "" {
@@ -59,12 +34,11 @@ func main() {
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		dbHost, dbPort, dbUser, dbPassword, dbName)
 
-	db, err := setupDB(dbDriver, dsn)
+	dbHandler, err := infrastructure.NewPostgreSQLHandler(dsn)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
-
-	defer db.Close()
+	defer dbHandler.DB.Close()
 
 	cmd.Execute()
 }
