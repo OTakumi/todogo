@@ -48,8 +48,6 @@ func init() {
 	viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
 	viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
 	viper.SetDefault("license", "apache")
-
-	rootCmd.AddCommand(versionCmd)
 }
 
 func initConfig() {
