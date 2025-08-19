@@ -32,3 +32,6 @@ go.work.sum
 # .vscode/
 
 todogo
+
+# Serena MCP
+.serena/
