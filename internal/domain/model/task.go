@@ -29,5 +29,10 @@ func (t *Task) Validate() error {
 		return errors.New("Title is required")
 	}
 
+	// Deadlineが設定されている場合、現在時刻より未来でなければならない
+	if t.Deadline != nil && t.Deadline.Before(time.Now()) {
+		return errors.New("Deadline must be in the future")
+	}
+
 	return nil
 }
