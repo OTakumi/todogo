@@ -20,7 +20,7 @@ func TestTaskRepository_FindAll(t *testing.T) {
 		// Arrange
 		db, mock, err := sqlmock.New()
 		assert.NoError(t, err)
-		defer db.Close()
+		defer func() { _ = db.Close() }()
 
 		repo := NewTaskRepository(db)
 		ctx := context.Background()
@@ -48,7 +48,7 @@ func TestTaskRepository_FindAll(t *testing.T) {
 		// Arrange
 		db, mock, err := sqlmock.New()
 		assert.NoError(t, err)
-		defer db.Close()
+		defer func() { _ = db.Close() }()
 
 		repo := NewTaskRepository(db)
 		ctx := context.Background()
@@ -87,7 +87,7 @@ func TestTaskRepository_FindAll(t *testing.T) {
 		// Arrange
 		db, mock, err := sqlmock.New()
 		assert.NoError(t, err)
-		defer db.Close()
+		defer func() { _ = db.Close() }()
 
 		repo := NewTaskRepository(db)
 		ctx := context.Background()
@@ -107,4 +107,3 @@ func TestTaskRepository_FindAll(t *testing.T) {
 		assert.NoError(t, mock.ExpectationsWereMet())
 	})
 }
-
