@@ -26,7 +26,7 @@ func TestTaskRepository_Create(t *testing.T) {
 		// Arrange
 		db, mock, err := sqlmock.New()
 		assert.NoError(t, err)
-		defer db.Close()
+		defer func() { _ = db.Close() }()
 
 		repo := NewTaskRepository(db)
 		ctx := context.Background()
@@ -39,6 +39,8 @@ func TestTaskRepository_Create(t *testing.T) {
 			IsComplete: false,
 		}
 
+		// トランザクションの期待値を設定
+		mock.ExpectBegin()
 		// INSERTクエリの期待値を設定
 		// IDはUUIDで自動生成されることを想定
 		mock.ExpectExec("INSERT INTO tasks").
@@ -51,6 +53,7 @@ func TestTaskRepository_Create(t *testing.T) {
 				sqlmock.AnyArg(), // UpdatedAt
 			).
 			WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectCommit()
 
 		// Act
 		createdTask, err := repo.Create(ctx, newTask)
@@ -76,7 +79,7 @@ func TestTaskRepository_Create(t *testing.T) {
 		// Arrange
 		db, mock, err := sqlmock.New()
 		assert.NoError(t, err)
-		defer db.Close()
+		defer func() { _ = db.Close() }()
 
 		repo := NewTaskRepository(db)
 		ctx := context.Background()
@@ -107,7 +110,7 @@ func TestTaskRepository_Create(t *testing.T) {
 		// Arrange
 		db, mock, err := sqlmock.New()
 		assert.NoError(t, err)
-		defer db.Close()
+		defer func() { _ = db.Close() }()
 
 		repo := NewTaskRepository(db)
 		ctx := context.Background()
@@ -120,6 +123,8 @@ func TestTaskRepository_Create(t *testing.T) {
 			IsComplete: false,
 		}
 
+		// トランザクションの期待値を設定
+		mock.ExpectBegin()
 		// INSERTクエリの期待値を設定
 		mock.ExpectExec("INSERT INTO tasks").
 			WithArgs(
@@ -131,6 +136,7 @@ func TestTaskRepository_Create(t *testing.T) {
 				sqlmock.AnyArg(), // UpdatedAt
 			).
 			WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectCommit()
 
 		// Act
 		createdTask, err := repo.Create(ctx, taskWithDeadline)
@@ -155,7 +161,7 @@ func TestTaskRepository_Create(t *testing.T) {
 		// Arrange
 		db, mock, err := sqlmock.New()
 		assert.NoError(t, err)
-		defer db.Close()
+		defer func() { _ = db.Close() }()
 
 		repo := NewTaskRepository(db)
 		ctx := context.Background()
@@ -166,6 +172,8 @@ func TestTaskRepository_Create(t *testing.T) {
 			IsComplete: false,
 		}
 
+		// トランザクションの期待値を設定
+		mock.ExpectBegin()
 		// INSERTクエリがエラーを返すように設定
 		mock.ExpectExec("INSERT INTO tasks").
 			WithArgs(
@@ -177,6 +185,7 @@ func TestTaskRepository_Create(t *testing.T) {
 				sqlmock.AnyArg(), // UpdatedAt
 			).
 			WillReturnError(sql.ErrConnDone)
+		mock.ExpectRollback()
 
 		// Act
 		createdTask, err := repo.Create(ctx, task)
@@ -185,7 +194,7 @@ func TestTaskRepository_Create(t *testing.T) {
 		// エラーが発生すること
 		assert.Error(t, err)
 		assert.Nil(t, createdTask)
-		assert.Contains(t, err.Error(), "failed to create task")
+		assert.Contains(t, err.Error(), "failed to insert task")
 
 		// モックの期待値が満たされていること
 		assert.NoError(t, mock.ExpectationsWereMet())
@@ -195,7 +204,7 @@ func TestTaskRepository_Create(t *testing.T) {
 		// Arrange
 		db, mock, err := sqlmock.New()
 		assert.NoError(t, err)
-		defer db.Close()
+		defer func() { _ = db.Close() }()
 
 		repo := NewTaskRepository(db)
 		ctx := context.Background()
@@ -208,6 +217,8 @@ func TestTaskRepository_Create(t *testing.T) {
 			IsComplete: false,
 		}
 
+		// トランザクションの期待値を設定
+		mock.ExpectBegin()
 		// INSERTクエリの期待値を設定
 		// IDはUUID形式で自動生成されることを期待
 		mock.ExpectExec("INSERT INTO tasks").
@@ -220,6 +231,7 @@ func TestTaskRepository_Create(t *testing.T) {
 				sqlmock.AnyArg(), // UpdatedAt
 			).
 			WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectCommit()
 
 		// Act
 		createdTask, err := repo.Create(ctx, taskWithoutID)
@@ -241,7 +253,7 @@ func TestTaskRepository_Create(t *testing.T) {
 		// Arrange
 		db, mock, err := sqlmock.New()
 		assert.NoError(t, err)
-		defer db.Close()
+		defer func() { _ = db.Close() }()
 
 		repo := NewTaskRepository(db)
 		ctx := context.Background()
@@ -255,6 +267,8 @@ func TestTaskRepository_Create(t *testing.T) {
 			IsComplete: false,
 		}
 
+		// トランザクションの期待値を設定
+		mock.ExpectBegin()
 		// INSERTクエリの期待値を設定
 		mock.ExpectExec("INSERT INTO tasks").
 			WithArgs(
@@ -266,6 +280,7 @@ func TestTaskRepository_Create(t *testing.T) {
 				sqlmock.AnyArg(),   // UpdatedAt
 			).
 			WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectCommit()
 
 		// Act
 		createdTask, err := repo.Create(ctx, task)
@@ -294,11 +309,85 @@ func TestTaskRepository_Create(t *testing.T) {
 		assert.NoError(t, mock.ExpectationsWereMet())
 	})
 
+	t.Run("トランザクション開始に失敗する", func(t *testing.T) {
+		// Arrange
+		db, mock, err := sqlmock.New()
+		assert.NoError(t, err)
+		defer func() { _ = db.Close() }()
+
+		repo := NewTaskRepository(db)
+		ctx := context.Background()
+
+		task := &model.Task{
+			Title:      "トランザクションエラーテスト",
+			Deadline:   nil,
+			IsComplete: false,
+		}
+
+		// トランザクション開始でエラーを返すように設定
+		mock.ExpectBegin().WillReturnError(sql.ErrConnDone)
+
+		// Act
+		createdTask, err := repo.Create(ctx, task)
+
+		// Assert
+		// エラーが発生すること
+		assert.Error(t, err)
+		assert.Nil(t, createdTask)
+		assert.Contains(t, err.Error(), "failed to begin transaction")
+
+		// モックの期待値が満たされていること
+		assert.NoError(t, mock.ExpectationsWereMet())
+	})
+
+	t.Run("コミットに失敗する", func(t *testing.T) {
+		// Arrange
+		db, mock, err := sqlmock.New()
+		assert.NoError(t, err)
+		defer func() { _ = db.Close() }()
+
+		repo := NewTaskRepository(db)
+		ctx := context.Background()
+
+		task := &model.Task{
+			Title:      "コミットエラーテスト",
+			Deadline:   nil,
+			IsComplete: false,
+		}
+
+		// トランザクションの期待値を設定
+		mock.ExpectBegin()
+		mock.ExpectExec("INSERT INTO tasks").
+			WithArgs(
+				sqlmock.AnyArg(), // ID
+				"コミットエラーテスト",      // Title
+				nil,              // Deadline
+				false,            // IsComplete
+				sqlmock.AnyArg(), // CreatedAt
+				sqlmock.AnyArg(), // UpdatedAt
+			).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+		// コミットでエラーを返すように設定
+		mock.ExpectCommit().WillReturnError(sql.ErrTxDone)
+
+		// Act
+		createdTask, err := repo.Create(ctx, task)
+
+		// Assert
+		// エラーが発生すること
+		assert.Error(t, err)
+		assert.Nil(t, createdTask)
+		assert.Contains(t, err.Error(), "failed to commit transaction")
+
+		// モックの期待値が満たされていること
+		assert.NoError(t, mock.ExpectationsWereMet())
+	})
+
 	t.Run("DeadlineがCreatedAtよりも過去の場合にバリデーションエラーが発生する", func(t *testing.T) {
 		// Arrange
 		db, mock, err := sqlmock.New()
 		assert.NoError(t, err)
-		defer db.Close()
+		defer func() { _ = db.Close() }()
 
 		repo := NewTaskRepository(db)
 		ctx := context.Background()
