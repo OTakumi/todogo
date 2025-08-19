@@ -12,15 +12,6 @@ import (
 )
 
 // TestTaskRepository_Create はTaskRepositoryのCreateメソッドのテストケース
-// TODO: Create test cases
-// - [ ] 正常にタスクを作成できるケース
-// - [ ] タイトルが空文字の場合にバリデーションエラーが発生するケース
-// - [ ] Deadlineがnilの場合でも正常に作成できるケース
-// - [ ] Deadlineが設定されている場合も正常に作成できるケース
-// - [ ] DeadlineがCreatedAtよりも過去の場合にバリデーションエラーが発生するケース
-// - [ ] DBへのINSERTが失敗するケース
-// - [ ] IDの自動生成が正しく動作するケース
-// - [ ] CreatedAtとUpdatedAtが正しく設定されるケース
 func TestTaskRepository_Create(t *testing.T) {
 	t.Run("正常にタスクを作成できる", func(t *testing.T) {
 		// Arrange
