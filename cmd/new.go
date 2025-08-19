@@ -14,7 +14,7 @@ var taskTitle string
 func init() {
 	// newコマンドをrootコマンドに追加
 	rootCmd.AddCommand(newCmd)
-	
+
 	// newコマンドにtitleフラグを追加
 	// このフラグは必須で、タスクのタイトルを指定するために使用される
 	newCmd.Flags().StringVarP(&taskTitle, "title", "t", "", "Task title (required)")

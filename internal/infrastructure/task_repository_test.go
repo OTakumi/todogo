@@ -107,4 +107,3 @@ func TestTaskRepository_FindAll(t *testing.T) {
 		assert.NoError(t, mock.ExpectationsWereMet())
 	})
 }
-

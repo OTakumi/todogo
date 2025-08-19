@@ -48,7 +48,7 @@ This command retrieves and displays all tasks with their details including:
 		// 整形されたテーブル出力のためのtabwriterを作成
 		// パラメータ: 出力先, 最小幅, タブ幅, パディング, パディング文字, フラグ
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-		
+
 		// テーブルヘッダーを出力
 		fmt.Fprintln(w, "ID\tTitle\tDeadline\tStatus\tCreated")
 		fmt.Fprintln(w, "---\t-----\t--------\t------\t-------")

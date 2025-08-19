@@ -4,4 +4,3 @@ package service
 type IDGenerator interface {
 	NewID() string
 }
-

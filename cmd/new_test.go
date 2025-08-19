@@ -162,4 +162,3 @@ func TestNewCommand_HandleUsecaseError(t *testing.T) {
 	// モックが呼び出されたことを検証
 	mockUsecase.AssertExpectations(t)
 }
-
